@@ -30,4 +30,7 @@ class AdminController extends Controller
     public function dashboard(){
         return view('admin.dashboard');
     }
+    public function slider(){
+        return view('admin.slider');
+    }
 }

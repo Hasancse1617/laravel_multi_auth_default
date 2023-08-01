@@ -35,5 +35,6 @@ Route::prefix('/admin')->namespace('App\Http\Controllers\Admin')->group(function
    
    Route::middleware(['admin'])->group(function(){
      Route::get('dashboard','AdminController@dashboard')->name('admin.dashboard');
+     Route::get('slider','AdminController@slider')->name('admin.slider');
    });
 });
