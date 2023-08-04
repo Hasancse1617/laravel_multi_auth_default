@@ -16,10 +16,8 @@ class AdminRedirectIfAuthenticated
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if(Auth::check()){
-            if(auth()->user()->role == 'admin'){
-                return redirect()->back();
-            }
+        if(Auth::guard('admin')->check()){
+            return redirect()->back();
         }
         return $next($request);
     }

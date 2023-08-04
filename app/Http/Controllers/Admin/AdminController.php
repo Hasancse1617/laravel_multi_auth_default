@@ -16,23 +16,32 @@ use Carbon\Carbon;
 
 class AdminController extends Controller
 {
+    protected $inputType;
+
     public function login(Request $request){
         if($request->isMethod('post')){
+            
+            $inputType = filter_var($request->input_type, FILTER_VALIDATE_EMAIL)? 'email':'username';
+            $request->merge([$inputType => $request->input_type]);
+
             $request->validate([
-                'email' => ['required', 'email'],
+                'email' => ['required_without:username', 'string', 'email', 'exists:admins,email'],
+                'username' => ['required_without:email', 'string', 'exists:admins,username'],
                 'password' => ['required'],
             ]);
+
             $data = $request->all();
-            $remember = 0;
-            if(isset($data->remember_me)){
-                $remember = 1;
+            $remember = false;
+            // dd($data);
+            if(isset($data['remember_me'])){
+                $remember = true;
             }
-            if (Auth::attempt(['email' => $data['email'], 'password' => $data['password'], 'role' => 'admin'], $remember)) {
+            if (Auth::guard('admin')->attempt([$inputType => $data['input_type'], 'password' => $data['password']], $remember)) {
                 $request->session()->regenerate();
                 return redirect('admin/dashboard');
             }
             return back()->withErrors([
-                'email' => 'The provided credentials do not match our records.',
+                'email' => 'Invalid Username or Password',
             ]);
         }
         return view('admin.login');
@@ -61,9 +70,6 @@ class AdminController extends Controller
             $email = $data['email'];
             $mailData = ['token'=>$token];
 
-            // Mail::send('emails.forgot-password',$messageData,function($message) use($email){
-            //     $message->to($email)->subject('Welcome to E-com Website');
-            // });
             Mail::to($email)->send(new PasswordResetMail($mailData));
 
             return redirect()->back()->with('success','We have e-mailed your password reset link!');
@@ -104,5 +110,10 @@ class AdminController extends Controller
     }
     public function slider(){
         return view('admin.slider');
+    }
+
+    public function logout(){
+        Auth::guard('admin')->logout();
+        return redirect()->route('admin.login')->with('success','logout successfully');
     }
 }

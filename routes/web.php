@@ -32,7 +32,7 @@ require __DIR__.'/auth.php';
 
 Route::prefix('/admin')->namespace('App\Http\Controllers\Admin')->group(function(){
    
-   Route::middleware(['admin_redirect_if_tauthenticated'])->group(function(){
+   Route::middleware(['admin_redirect_if_authenticated'])->group(function(){
      Route::match(['get','post'],'login','AdminController@login')->name('admin.login');
      Route::match(['get','post'],'forgot-password','AdminController@forgotPassword')->name('admin.forgot_password');
      Route::match(['get','post'],'reset-password/{token}','AdminController@resetPassword')->name('admin.reset_password');
@@ -41,5 +41,6 @@ Route::prefix('/admin')->namespace('App\Http\Controllers\Admin')->group(function
    Route::middleware(['admin'])->group(function(){
      Route::get('dashboard','AdminController@dashboard')->name('admin.dashboard');
      Route::get('slider','AdminController@slider')->name('admin.slider');
+     Route::get('logout','AdminController@logout')->name('admin.logout');
    });
 });
